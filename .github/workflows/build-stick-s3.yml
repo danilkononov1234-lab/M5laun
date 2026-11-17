@@ -1,0 +1,27 @@
+name: Build Momentum M5StickS3
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:v5.4.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build firmware
+        shell: bash
+        run: |
+          . "$IDF_PATH/export.sh"
+          python tools/build_m5stick_s3.py --jobs 2
+      - name: Upload firmware artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: momentum-m5sticks3-build
+          path: |
+            bin/*.bin
+            bin/*.json
+            bin/*.md
+          if-no-files-found: warn
