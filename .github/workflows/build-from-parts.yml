@@ -1,0 +1,35 @@
+name: Build Momentum from ZIP parts
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'momentum-source.zip.part*'
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:v5.4.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reassemble and extract source
+        shell: bash
+        run: |
+          cat momentum-source.zip.part* > /tmp/momentum-source.zip
+          python - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('/tmp/momentum-source.zip') as z:
+              z.extractall('source')
+          PY
+      - name: Build firmware
+        shell: bash
+        working-directory: source
+        run: |
+          . "$IDF_PATH/export.sh"
+          python tools/build_m5stick_s3.py --jobs 2
+      - name: Upload firmware
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: momentum-m5sticks3
+          path: source/bin/
+          if-no-files-found: warn
