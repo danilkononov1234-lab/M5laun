@@ -1,0 +1,29 @@
+name: Minecraft Momentum 012
+on:
+  push:
+    branches: [minecraft-flipper]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Momentum
+        run: git clone --recursive --depth 1 --branch mntm-012 https://github.com/Next-Flip/Momentum-Firmware.git firmware
+      - name: Build
+        run: |
+          cp -r minecraft_flipper firmware/applications_user/
+          cd firmware
+          ./fbt fap_minecraft_flipper
+      - name: Locate compiled FAP
+        run: |
+          find firmware -type f -name '*.fap' -print
+          fap=$(find firmware -type f -name 'minecraft_flipper.fap' -print -quit)
+          test -n "$fap"
+          mkdir -p output
+          cp "$fap" output/Minecraft.fap
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Minecraft-Momentum-012
+          path: output/Minecraft.fap
+          if-no-files-found: error
