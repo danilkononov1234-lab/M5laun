@@ -19,6 +19,15 @@ jobs:
         run: |
           cat Bruce_port.zip.part00 Bruce_port.zip.part01 Bruce_port.zip.part02 > bruce.zip
           unzip -q bruce.zip -d bruce-source
+      - name: Restore Adafruit BusIO
+        working-directory: bruce-source/firmware-main
+        run: |
+          if [ ! -f lib/Adafruit-BusIO/library.properties ] && [ ! -f lib/Adafruit-BusIO/library.json ]; then
+            mkdir -p lib
+            git clone --depth 1 https://github.com/adafruit/Adafruit_BusIO.git /tmp/bruce-busio
+            mkdir -p lib/Adafruit-BusIO
+            cp -a /tmp/bruce-busio/. lib/Adafruit-BusIO/
+          fi
       - name: Install PlatformIO
         run: python -m pip install platformio
       - name: Build firmware
