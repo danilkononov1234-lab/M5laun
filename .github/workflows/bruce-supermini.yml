@@ -28,6 +28,29 @@ jobs:
             mkdir -p lib/Adafruit-BusIO
             cp -a /tmp/bruce-busio/. lib/Adafruit-BusIO/
           fi
+      - name: Restore missing submodules
+        working-directory: bruce-source/firmware-main
+        run: |
+          if [ -f .gitmodules ]; then
+            python - <<'PY'
+          import configparser, pathlib, subprocess
+          c=configparser.ConfigParser()
+          c.read('.gitmodules')
+          for section in c.sections():
+              p=pathlib.Path(c[section]['path'])
+              url=c[section]['url']
+              if p.exists() and any(p.iterdir()):
+                  continue
+              if url.startswith('https://github.com/'):
+                  p.parent.mkdir(parents=True, exist_ok=True)
+                  subprocess.run(['git','clone','--depth','1','--recursive',url,str(p)],check=True)
+          PY
+          fi
+          if [ ! -f lib/Adafruit-PN532/library.properties ] && [ ! -f lib/Adafruit-PN532/library.json ]; then
+            git clone --depth 1 https://github.com/adafruit/Adafruit-PN532.git /tmp/bruce-pn532
+            mkdir -p lib/Adafruit-PN532
+            cp -a /tmp/bruce-pn532/. lib/Adafruit-PN532/
+          fi
       - name: Install PlatformIO
         run: python -m pip install platformio
       - name: Build firmware
