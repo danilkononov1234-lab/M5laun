@@ -1,0 +1,1 @@
+App(appid="gta_flipper", name="GTA VI Mini", apptype=FlipperAppType.EXTERNAL, entry_point="gta_main", requires=["gui"], stack_size=4096, fap_category="Games")
