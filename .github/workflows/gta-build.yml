@@ -15,8 +15,15 @@ jobs:
           cp -r gta_flipper firmware/applications_user/
           cd firmware
           ./fbt fap_gta_flipper
+      - name: Locate compiled FAP
+        run: |
+          find firmware -type f -name '*.fap' -print
+          fap=$(find firmware -type f -name 'gta_flipper.fap' -print -quit)
+          test -n "$fap"
+          mkdir -p output
+          cp "$fap" output/GTA_VI.fap
       - uses: actions/upload-artifact@v4
         with:
           name: GTA-VI-Momentum-012
-          path: firmware/build/**/gta_flipper.fap
+          path: output/GTA_VI.fap
           if-no-files-found: error
