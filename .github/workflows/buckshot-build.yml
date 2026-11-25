@@ -8,6 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Extract uploaded sources
+        run: |
+          test -f Buckshot_v3_sources.zip
+          mkdir -p extracted
+          unzip -o Buckshot_v3_sources.zip -d extracted
+          app=$(find extracted -type f -name application.fam -print -quit)
+          test -n "$app"
+          rm -rf buckshot_flipper
+          cp -r "$(dirname "$app")" buckshot_flipper
       - name: Get Momentum
         run: git clone --recursive --depth 1 --branch mntm-012 https://github.com/Next-Flip/Momentum-Firmware.git firmware
       - name: Build
