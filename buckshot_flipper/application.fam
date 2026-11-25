@@ -1,0 +1,1 @@
+App(appid="buckshot_flipper",name="Buckshot Roulette",apptype=FlipperAppType.EXTERNAL,entry_point="buckshot_main",requires=["gui"],stack_size=4096,fap_category="Games")
